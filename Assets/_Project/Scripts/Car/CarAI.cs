@@ -1,56 +1,41 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-/// <summary>
-/// CarAI.cs (revisi)
-/// Fix untuk Masalah A (antrean nggak rapi):
-///  - 3.1: rayLength sekarang dihitung relatif ke ukuran mobil (bukan angka fix untuk semua prefab)
-///  - 3.2: carLayer di-assign & divalidasi di Awake, warning kalau lupa di-set
-///  - 3.3: origin raycast dihitung otomatis dari Collider.bounds mobil sendiri,
-///         bukan offset hardcode transform.forward * 1.2f, jadi nggak nyangkut collider sendiri
-///         walau ukuran/prefab mobil beda-beda.
-///
-/// Juga: daftar CarAI aktif (static list) supaya SpawnerSouth bisa tau JUMLAH mobil
-/// aktif di scene secara akurat -> dipakai untuk fix Masalah B (cap jumlah mobil).
-/// </summary>
 [RequireComponent(typeof(Collider))]
+[RequireComponent(typeof(Rigidbody))]
 public class CarAI : MonoBehaviour
 {
     [Header("Movement")]
-    [SerializeField] private float moveSpeed = 6f;
+    [SerializeField] private float moveSpeed = 7f;
 
-    [Header("Deteksi Mobil di Depan")]
-    [Tooltip("Jarak aman TAMBAHAN di depan bumper mobil, biasanya sekitar 1x panjang mobil. " +
-             "Ini BUKAN total ray length -> total = setengah panjang mobil (dari bounds) + nilai ini.")]
-    [SerializeField] private float extraSafeDistance = 2.2f;
+    [Header("Deteksi Mobil (Tanpa Raycast!)")]
+    [Tooltip("Jarak berhenti dari pusat mobil ke mobil depannya")]
+    [SerializeField] private float safeDistance = 1f; 
 
-    [SerializeField] private LayerMask carLayer;
+    [Header("Stress System")]
+    [Range(0, 100)] public float stress = 0f;
+    public float stressGainWaiting = 5f;
+    public float stressGainNormal = 0.5f;
+    public float stressLossNearMiss = 25f;
+    public float stressLossMinorCollision = 40f;
+    public float stressLossRapidChange = 10f;
+    
+    public StressBarUI stressBarUI; 
 
     [Header("Debug")]
     [SerializeField] private bool drawGizmo = true;
 
-    private Collider _myCollider;
-    private float _halfLength;      // setengah panjang mobil di sumbu forward, dari bounds asli
     private bool _stoppedByLight;
     private bool _stoppedByCarAhead;
 
-    // Registry global -> dipakai SpawnerSouth buat itung mobil aktif tanpa FindObjectsByType tiap frame
+    // Registry global array/list
     public static readonly List<CarAI> ActiveCars = new List<CarAI>();
 
     private void Awake()
     {
-        _myCollider = GetComponent<Collider>();
-
-        // Hitung setengah panjang mobil di sumbu forward LOKAL, dari collider bounds asli (bukan world bounds
-        // yang udah kena rotasi, biar konsisten walau mobil spawn dengan rotasi apapun).
-        _halfLength = GetLocalHalfLengthOnForwardAxis(_myCollider);
-
-        if (carLayer.value == 0)
-        {
-            Debug.LogWarning($"[CarAI] '{name}': Car Layer belum di-set (masih Nothing). " +
-                              "Raycast deteksi mobil di depan TIDAK akan berfungsi. " +
-                              "Set field Car Layer ke layer 'Car' di Inspector.", this);
-        }
+        // Supaya tidak terpengaruh fisika/benturan aneh bawaan Unity
+        Rigidbody rb = GetComponent<Rigidbody>();
+        rb.isKinematic = true; 
     }
 
     private void OnEnable() => ActiveCars.Add(this);
@@ -58,68 +43,78 @@ public class CarAI : MonoBehaviour
 
     private void Update()
     {
-        _stoppedByCarAhead = IsCarAhead();
+        // Gunakan fungsi pendeteksi berbasis Array/List
+        _stoppedByCarAhead = IsCarAheadMath();
+        
         bool isStopped = _stoppedByLight || _stoppedByCarAhead;
 
         if (!isStopped)
         {
             transform.position += transform.forward * moveSpeed * Time.deltaTime;
+            stress += stressGainNormal * Time.deltaTime;
+        }
+        else
+        {
+            stress += stressGainWaiting * Time.deltaTime;
+        }
+
+        stress = Mathf.Clamp(stress, 0, 100);
+        if (stressBarUI != null)
+        {
+            stressBarUI.SetValue(stress / 100f);
+        }
+
+        if (stress >= 100f && GameManager.Instance != null)
+        {
+            GameManager.Instance.TriggerTawuran(this);
         }
     }
 
-    /// <summary>Dipanggil oleh StopPoint_South saat mobil ada di trigger area lampu.</summary>
     public void SetStoppedByLight(bool value)
     {
         _stoppedByLight = value;
     }
 
-    private bool IsCarAhead()
+    // ==============================================================
+    // LOGIKA BARU: Cek jarak pakai Array/List, Murni Matematika!
+    // ==============================================================
+    private bool IsCarAheadMath()
     {
-        // Origin = posisi mobil + (setengah panjang mobil) ke arah depan.
-        // Ini FIX untuk 3.3: origin sekarang selalu tepat di ujung depan collider mobil,
-        // berapapun ukuran collider-nya, jadi ray nggak pernah start dari DALAM collider sendiri.
-        Vector3 origin = transform.position + transform.forward * (_halfLength + 0.02f); // +0.02 biar bener2 di luar permukaan collider
-        float totalRayLength = extraSafeDistance;
-
-        bool hit = Physics.Raycast(origin, transform.forward, out RaycastHit hitInfo, totalRayLength, carLayer);
-
-        if (drawGizmo)
+        foreach (CarAI otherCar in ActiveCars)
         {
-            Debug.DrawRay(origin, transform.forward * totalRayLength, hit ? Color.red : Color.green);
-        }
+            // Jangan ngecek diri sendiri
+            if (otherCar == this) continue;
 
-        return hit;
+            // Cari tahu arah mobil lain tersebut dari posisi kita
+            Vector3 dirToOther = otherCar.transform.position - transform.position;
+            
+            // Cek apakah mobil tersebut ada di DEPAN kita (searah dengan kap mobil kita)
+            // Dot Product > 0.8 berarti dia benar-benar berada di lajur depan kita
+            if (Vector3.Dot(transform.forward, dirToOther.normalized) > 0.8f)
+            {
+                // Cek jarak pastinya (dari titik tengah ke titik tengah)
+                float distance = dirToOther.magnitude;
+
+                // Jika jaraknya lebih dekat dari jarak aman, BERHENTI!
+                if (distance <= safeDistance)
+                {
+                    return true; 
+                }
+            }
+        }
+        return false;
     }
 
-    /// <summary>
-    /// Ambil setengah panjang collider di sumbu forward (Z lokal) dari local bounds,
-    /// bukan world bounds -> supaya hasilnya konsisten independen dari rotasi transform saat ini.
-    /// </summary>
-    private float GetLocalHalfLengthOnForwardAxis(Collider col)
-    {
-        if (col is BoxCollider box)
-        {
-            // box.size dalam local space, sumbu Z = forward (asumsi model mobil menghadap +Z)
-            Vector3 scaledSize = Vector3.Scale(box.size, transform.lossyScale);
-            return scaledSize.z * 0.5f;
-        }
-
-        // Fallback untuk collider tipe lain (Capsule/Mesh): pakai world bounds extents.z
-        // (kurang presisi kalau mobil lagi dirotasi, tapi cukup aman sebagai fallback)
-        return col.bounds.extents.z;
-    }
-
-    private void OnDrawGizmosSelected()
+    private void OnDrawGizmos()
     {
         if (!drawGizmo) return;
-        Collider col = GetComponent<Collider>();
-        if (col == null) return;
-
-        float halfLen = Application.isPlaying ? _halfLength : GetLocalHalfLengthOnForwardAxis(col);
-        Vector3 origin = transform.position + transform.forward * (halfLen + 0.02f);
-
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(origin, 0.15f);
-        Gizmos.DrawLine(origin, origin + transform.forward * extraSafeDistance);
+        
+        Gizmos.color = _stoppedByCarAhead ? Color.red : Color.green;
+        Gizmos.DrawLine(transform.position, transform.position + transform.forward * safeDistance);
     }
+
+    // (Fungsi stress relief ditaruh di bawah sini agar rapi)
+    public void ApplyNearMiss() => stress = Mathf.Clamp(stress - stressLossNearMiss, 0, 100);
+    public void ApplyMinorCollision() => stress = Mathf.Clamp(stress - stressLossMinorCollision, 0, 100);
+    public void ApplyRapidChangeConfusion() => stress = Mathf.Clamp(stress - stressLossRapidChange, 0, 100);
 }
