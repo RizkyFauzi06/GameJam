@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &6035392789930418388
+--- !u!1 &6312431559436920764
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,23 +8,23 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 2195057124813294487}
-  - component: {fileID: 8755064799767950824}
-  - component: {fileID: 2462382942389477532}
+  - component: {fileID: 8989980647821550339}
+  - component: {fileID: 3354494897798091580}
+  - component: {fileID: 6497350696143362165}
   m_Layer: 5
-  m_Name: Image
+  m_Name: EmoticonIcon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!224 &2195057124813294487
+--- !u!224 &8989980647821550339
 RectTransform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6035392789930418388}
+  m_GameObject: {fileID: 6312431559436920764}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -35,37 +35,37 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 150, y: 20}
+  m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!222 &8755064799767950824
+--- !u!222 &3354494897798091580
 CanvasRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6035392789930418388}
+  m_GameObject: {fileID: 6312431559436920764}
   m_CullTransparentMesh: 1
---- !u!114 &2462382942389477532
+--- !u!114 &6497350696143362165
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6035392789930418388}
+  m_GameObject: {fileID: 6312431559436920764}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0, b: 0, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10911, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 21300000, guid: e267bea8ea1555143ab1354950855a2d, type: 3}
   m_Type: 3
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -107,12 +107,12 @@ RectTransform:
   m_LocalScale: {x: 0.01, y: 0.01, z: 0.01}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 2195057124813294487}
+  - {fileID: 8989980647821550339}
   m_Father: {fileID: 1984165007303038553}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 2}
+  m_AnchoredPosition: {x: 0, y: 2.375}
   m_SizeDelta: {x: 150, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &4644518108166407001
@@ -191,11 +191,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30001868b53d8614fbc76d5622a21a02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StressBarUI
-  fillImage: {fileID: 2462382942389477532}
+  fillImage: {fileID: 6497350696143362165}
   stressGradient:
     serializedVersion: 2
     key0: {r: 1, g: 1, b: 1, a: 1}
-    key1: {r: 0.9622642, g: 0.049020927, b: 0.049020927, a: 1}
+    key1: {r: 1, g: 1, b: 1, a: 1}
     key2: {r: 0, g: 0, b: 0, a: 0}
     key3: {r: 0, g: 0, b: 0, a: 0}
     key4: {r: 0, g: 0, b: 0, a: 0}
@@ -222,6 +222,12 @@ MonoBehaviour:
     m_ColorSpace: 0
     m_NumColorKeys: 2
     m_NumAlphaKeys: 2
+  emotionIcon: {fileID: 6497350696143362165}
+  senangSprite: {fileID: 21300000, guid: e267bea8ea1555143ab1354950855a2d, type: 3}
+  biasaAjaSprite: {fileID: 21300000, guid: 9e63c4ebdb22bf74e97119ae4e642eac, type: 3}
+  sedihSprite: {fileID: 21300000, guid: e902e3a359c325944bee753def3284c4, type: 3}
+  takutSprite: {fileID: 21300000, guid: 78d1f46d82ec39444a04552fc00fbc13, type: 3}
+  marahSprite: {fileID: 21300000, guid: 097af7ec449c73e469195b0e8e8960fc, type: 3}
 --- !u!1001 &2018618629204193714
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -244,15 +250,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f4bad9524e092a6498994bd842c6b648, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.033
+      value: -0.15940367
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f4bad9524e092a6498994bd842c6b648, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.02593
+      value: 0.00000012452426
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f4bad9524e092a6498994bd842c6b648, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -5.29532
+      value: -2.1459243
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f4bad9524e092a6498994bd842c6b648, type: 3}
       propertyPath: m_LocalRotation.w

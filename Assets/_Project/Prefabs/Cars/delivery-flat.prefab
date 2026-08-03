@@ -147,6 +147,12 @@ MonoBehaviour:
     m_ColorSpace: 0
     m_NumColorKeys: 3
     m_NumAlphaKeys: 2
+  emotionIcon: {fileID: 1084621373785582981}
+  senangSprite: {fileID: 21300000, guid: e267bea8ea1555143ab1354950855a2d, type: 3}
+  biasaAjaSprite: {fileID: 21300000, guid: 9e63c4ebdb22bf74e97119ae4e642eac, type: 3}
+  sedihSprite: {fileID: 21300000, guid: e902e3a359c325944bee753def3284c4, type: 3}
+  takutSprite: {fileID: 21300000, guid: 78d1f46d82ec39444a04552fc00fbc13, type: 3}
+  marahSprite: {fileID: 21300000, guid: 097af7ec449c73e469195b0e8e8960fc, type: 3}
 --- !u!1 &3525016696994215015
 GameObject:
   m_ObjectHideFlags: 0
@@ -159,7 +165,7 @@ GameObject:
   - component: {fileID: 2849222040558922435}
   - component: {fileID: 1084621373785582981}
   m_Layer: 5
-  m_Name: Image
+  m_Name: EmoticonIcon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -182,7 +188,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 180, y: 20}
+  m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2849222040558922435
 CanvasRenderer:
@@ -205,14 +211,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0, b: 0, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10911, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 21300000, guid: e267bea8ea1555143ab1354950855a2d, type: 3}
   m_Type: 3
   m_PreserveAspect: 0
   m_FillCenter: 1
